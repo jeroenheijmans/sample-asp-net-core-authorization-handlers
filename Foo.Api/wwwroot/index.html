@@ -1,0 +1,57 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+    <h2>Tokens</h2>
+    <button id="getToken">Get Fresh Client Credentials Token</button>
+    <textarea id="token" style="width: 100%; height: 15em;"></textarea>
+
+    <h2>Api Calls</h2>
+    <button id="index">Get() (index)</button>
+    |
+    <button id="a">GetA()</button>
+    <button id="b">GetB()</button>
+    <button id="etc">GetEtc()</button>
+    |
+    <button id="semi-protected">GetSemiProtected()</button>
+    <p>Results:</p>
+    <pre id="results" style="padding: 5px; background: #eee; border: 1px solid #aaa;"></pre>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const el = id => document.getElementById(id);
+            const addOnClick = (id, handler) => el(id).addEventListener("click", handler);
+            let token = '';
+
+            addOnClick("getToken", () => {
+                fetch("https://demo.identityserver.io/connect/token", {
+                    method: "POST",
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+                    body: `grant_type=client_credentials&client_id=m2m&client_secret=secret`
+                })
+                    .then(data => data.json())
+                    .then(json => {
+                        token = json.access_token;
+                        el("token").value = JSON.stringify(json, null, 2);
+                    });
+            });
+
+            function apiGet(path) {
+                fetch(path, { headers: { "Authorization": `Bearer ${token}` } })
+                    .then(data => data.status === 200 ? data.text() : `Error ${data.status}`)
+                    .then(txt => el("results").innerHTML = `${new Date().toISOString()}: ${txt}\n${el("results").innerHTML}`)
+                    .catch(e => console.error(e));
+            }
+
+            addOnClick("index", () => apiGet("/bar/"));
+            addOnClick("a", () => apiGet("/bar/a"));
+            addOnClick("b", () => apiGet("/bar/b"));
+            addOnClick("etc", () => apiGet("/bar/etc"));
+            addOnClick("semi-protected", () => apiGet("/bar/semi-protected"));
+        });
+    </script>
+</body>
+</html>

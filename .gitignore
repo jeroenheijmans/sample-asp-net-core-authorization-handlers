@@ -1,0 +1,13 @@
+**/.DS_Store
+**/.vscode
+**/*.suo
+**/*.user
+**/[Dd]ebug/
+**/[Dd]ebugPublic/
+**/[Rr]elease/
+**/[Rr]eleases/
+**/obj/
+**/bin/
+**/.vs/
+.idea/
+tempkey.rsa
