@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -16,6 +17,7 @@ namespace Foo.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddHttpContextAccessor();
             services.AddControllers();
             services.AddAuthentication("Bearer")
                 .AddIdentityServerAuthentication(o =>
@@ -24,6 +26,8 @@ namespace Foo.Api
                     o.ApiName = "api";
                 });
             services.AddAuthorization(o => o.AddPolicy("MyPolicy", Policies.MyPolicy()));
+            services.AddTransient<IAuthorizationHandler, RegularClientAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, ShortClientAuthorizationHandler>();
         }
 
         public void Configure(IApplicationBuilder app)
